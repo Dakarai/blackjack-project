@@ -95,7 +95,10 @@ if __name__ == '__main__':
                 print("Looks like you didn't enter an integer.")
                 pass
             else:
-                break
+                if bet_amount > player_human.balance:
+                    print("You can't bet that much!")
+                else:
+                    break
 
         # deal and display initial cards and totals
         player_human.hand.add_card(new_deck.deal_one())

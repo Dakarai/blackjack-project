@@ -101,7 +101,7 @@ if __name__ == '__main__':
         player_human.hand.add_card(new_deck.deal_one())
         player_human.hand.add_card(new_deck.deal_one())
         player_dealer.hand.add_card(new_deck.deal_one())
-        print("Dealer has: {}".format(player_dealer.hand.))
+        print("Dealer has: {}".format(player_dealer.hand))
         print("{} has: {}".format(name, player_human.hand))
         print("{}'s total: {}".format(name, player_human.hand.hand_total()))
 

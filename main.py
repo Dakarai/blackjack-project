@@ -16,7 +16,6 @@ class Card:
 
 
 class Deck:
-
     def __init__(self):
         self.all_cards = []
         for suit in suits:
@@ -29,16 +28,16 @@ class Deck:
     def deal_one(self):
         return self.all_cards.pop(0)
 
+    def __repr__(self):
+        return str(self.all_cards)
+
 
 class Hand:
     def __init__(self):
         self.hand = []
-        self.total = 0
 
     def add_card(self, card):
         self.hand.append(card)
-        # update total after adding the card
-        self.total = self.hand_total()
 
     def hand_total(self):
         num_aces = 0
@@ -56,8 +55,10 @@ class Hand:
         while temp_total <= 11 and num_aces >= 1:
             temp_total += 10
             num_aces -= 1
-        self.total = temp_total
-        return self.total
+        return temp_total
+
+    def __repr__(self):
+        return str(self.hand)
 
 
 class Player:
@@ -86,7 +87,7 @@ if __name__ == '__main__':
         player_human.new_game()
         player_dealer.new_game()
 
-        print("Player Balance: {}".format(player_human.balance))
+        print("{}'s Balance: {}".format(name, player_human.balance))
         while True:
             try:
                 bet_amount = int(input("How much to bet? "))
@@ -100,13 +101,13 @@ if __name__ == '__main__':
         player_human.hand.add_card(new_deck.deal_one())
         player_human.hand.add_card(new_deck.deal_one())
         player_dealer.hand.add_card(new_deck.deal_one())
-        print("DEALER HAS: {}".format(player_dealer.hand.hand))
-        print("Player has: {}".format(player_human.hand.hand))
-        print("Player total: {}".format(player_human.hand.total))
+        print("Dealer has: {}".format(player_dealer.hand.))
+        print("{} has: {}".format(name, player_human.hand))
+        print("{}'s total: {}".format(name, player_human.hand.hand_total()))
 
         # continue until player stands or busts
         stand = False
-        while not stand and player_human.hand.total < 21:
+        while not stand and player_human.hand.hand_total() < 21:
             while True:
                 response = input("[H]it or [S]tand? ")
                 if response[0].capitalize() == 'H':
@@ -118,29 +119,34 @@ if __name__ == '__main__':
                 else:
                     print("Invalid response.")
                     continue
-            print("DEALER HAS: {}".format(player_dealer.hand.hand))
-            print("Player has: {}".format(player_human.hand.hand))
-            print("Player total: {}".format(player_human.hand.total))
+            print()
+            print("DEALER HAS: {}".format(player_dealer.hand))
+            print("{} has: {}".format(name, player_human.hand))
+            print("{}'s total: {}".format(name, player_human.hand.hand_total()))
+            print()
 
         # dealer game play
-        while player_dealer.hand.total < player_human.hand.total <= 21:
+        while player_dealer.hand.hand_total() < player_human.hand.hand_total() <= 21:
             player_dealer.hand.add_card(new_deck.deal_one())
-            print("Dealer has: {}".format(player_dealer.hand.hand))
-            print("Dealer total: {}".format(player_dealer.hand.total))
+            print("Dealer has: {}".format(player_dealer.hand))
+            print("Dealer total: {}".format(player_dealer.hand.hand_total()))
+            print()
 
         # evaluate winner
-        print("Player total: {}".format(player_human.hand.total))
-        print("Dealer total: {}".format(player_dealer.hand.total))
-        if player_human.hand.total > 21:
+        player_hand_total = player_human.hand.hand_total()
+        dealer_hand_total = player_dealer.hand.hand_total()
+        print("{}'s total: {}".format(name, player_hand_total))
+        print("Dealer total: {}".format(dealer_hand_total))
+        if player_hand_total > 21:
             print("Bust! ")
             player_human.balance -= bet_amount
-        elif player_dealer.hand.total < player_human.hand.total <= 21:
+        elif dealer_hand_total < player_hand_total <= 21:
             print("You win! ")
             player_human.balance += bet_amount
-        elif player_human.hand.total < player_dealer.hand.total <= 21:
-            print(" You lose! ")
+        elif player_hand_total < dealer_hand_total <= 21:
+            print("You lose! ")
             player_human.balance -= bet_amount
-        elif player_dealer.hand.total == player_human.hand.total:
+        elif dealer_hand_total == player_hand_total:
             print("Tie! ")
         else:
             print("Dealer busts! You win! ")

@@ -3,6 +3,7 @@ import random
 suits = ('Clubs', 'Diamonds', 'Hearts', 'Spades')
 ranks = ('2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A')
 values = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'T': 10, 'J': 10, 'Q': 10, 'K': 10, 'A': 1}
+max_shoe_size = 12
 
 
 class Card:
@@ -15,18 +16,23 @@ class Card:
         return self.rank + "" + self.suit
 
 
-class Deck:
-    def __init__(self):
+class Shoe:
+    def __init__(self, decks):
         self.all_cards = []
-        for suit in suits:
-            for rank in ranks:
-                self.all_cards.append(Card(suit, rank))
+        self.size = decks * 52
+        for _ in range(decks):
+            for suit in suits:
+                for rank in ranks:
+                    self.all_cards.append(Card(suit, rank))
 
     def shuffle(self):
         random.shuffle(self.all_cards)
 
     def deal_one(self):
         return self.all_cards.pop(0)
+
+    def remaining_percentage(self):
+        return len(self.all_cards) / self.size
 
     def __repr__(self):
         return str(self.all_cards)
@@ -77,11 +83,25 @@ if __name__ == '__main__':
     player_human = Player(name, 1000)
     player_dealer = Player("Dealer", 1000)
 
+    while True:
+        try:
+            num_decks = int(input("How many decks to play with? "))
+        except ValueError:
+            print("Looks like you didn't enter an integer.")
+            pass
+        else:
+            if num_decks > max_shoe_size:
+                print("Let's not get crazy here. Choose between 1-12 decks.")
+            elif num_decks <= 0:
+                print("Choose a real value to play with.")
+            else:
+                break
+
     play_game = True
     while play_game:
         # create deck object and shuffle it
-        new_deck = Deck()
-        new_deck.shuffle()
+        new_shoe = Shoe(num_decks)
+        new_shoe.shuffle()
 
         # reset player hands
         player_human.new_game()
@@ -97,13 +117,15 @@ if __name__ == '__main__':
             else:
                 if bet_amount > player_human.balance:
                     print("You can't bet that much!")
+                elif bet_amount <= 0:
+                    print("Choose a real value to bet with.")
                 else:
                     break
 
         # deal and display initial cards and totals
-        player_human.hand.add_card(new_deck.deal_one())
-        player_human.hand.add_card(new_deck.deal_one())
-        player_dealer.hand.add_card(new_deck.deal_one())
+        player_human.hand.add_card(new_shoe.deal_one())
+        player_human.hand.add_card(new_shoe.deal_one())
+        player_dealer.hand.add_card(new_shoe.deal_one())
         print("Dealer has: {}".format(player_dealer.hand))
         print("{} has: {}".format(name, player_human.hand))
         print("{}'s total: {}".format(name, player_human.hand.hand_total()))
@@ -114,7 +136,7 @@ if __name__ == '__main__':
             while True:
                 response = input("[H]it or [S]tand? ")
                 if response[0].capitalize() == 'H':
-                    player_human.hand.add_card(new_deck.deal_one())
+                    player_human.hand.add_card(new_shoe.deal_one())
                     break
                 elif response[0].capitalize() == 'S':
                     stand = True
@@ -123,14 +145,14 @@ if __name__ == '__main__':
                     print("Invalid response.")
                     continue
             print()
-            print("DEALER HAS: {}".format(player_dealer.hand))
+            print("Dealer has: {}".format(player_dealer.hand))
             print("{} has: {}".format(name, player_human.hand))
             print("{}'s total: {}".format(name, player_human.hand.hand_total()))
             print()
 
         # dealer game play
         while player_dealer.hand.hand_total() < player_human.hand.hand_total() <= 21:
-            player_dealer.hand.add_card(new_deck.deal_one())
+            player_dealer.hand.add_card(new_shoe.deal_one())
             print("Dealer has: {}".format(player_dealer.hand))
             print("Dealer total: {}".format(player_dealer.hand.hand_total()))
             print()
@@ -141,16 +163,16 @@ if __name__ == '__main__':
         print("{}'s total: {}".format(name, player_hand_total))
         print("Dealer total: {}".format(dealer_hand_total))
         if player_hand_total > 21:
-            print("Bust! ")
+            print("Bust!")
             player_human.balance -= bet_amount
         elif dealer_hand_total < player_hand_total <= 21:
-            print("You win! ")
+            print("You win!")
             player_human.balance += bet_amount
         elif player_hand_total < dealer_hand_total <= 21:
-            print("You lose! ")
+            print("You lose!")
             player_human.balance -= bet_amount
         elif dealer_hand_total == player_hand_total:
-            print("Tie! ")
+            print("Tie!")
         else:
-            print("Dealer busts! You win! ")
+            print("Dealer busts! You win!")
             player_human.balance += bet_amount

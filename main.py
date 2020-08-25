@@ -4,6 +4,7 @@ suits = ('Clubs', 'Diamonds', 'Hearts', 'Spades')
 ranks = ('2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A')
 values = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'T': 10, 'J': 10, 'Q': 10, 'K': 10, 'A': 1}
 max_shoe_size = 12
+shuffle_at_percentage = 0.25
 
 
 class Card:
@@ -97,11 +98,15 @@ if __name__ == '__main__':
             else:
                 break
 
+    # create deck object and shuffle it
+    new_shoe = Shoe(num_decks)
+    new_shoe.shuffle()
     play_game = True
     while play_game:
-        # create deck object and shuffle it
-        new_shoe = Shoe(num_decks)
-        new_shoe.shuffle()
+        # check if current cards in shoe is below the threshold needed to reshuffle
+        if new_shoe.remaining_percentage() < shuffle_at_percentage:
+            new_shoe = Shoe(num_decks)
+            new_shoe.shuffle()
 
         # reset player hands
         player_human.new_game()
@@ -162,6 +167,7 @@ if __name__ == '__main__':
         dealer_hand_total = player_dealer.hand.hand_total()
         print("{}'s total: {}".format(name, player_hand_total))
         print("Dealer total: {}".format(dealer_hand_total))
+        print()
         if player_hand_total > 21:
             print("Bust!")
             player_human.balance -= bet_amount
@@ -176,3 +182,4 @@ if __name__ == '__main__':
         else:
             print("Dealer busts! You win!")
             player_human.balance += bet_amount
+        print()

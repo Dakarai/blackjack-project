@@ -80,6 +80,12 @@ class Player:
 
 if __name__ == '__main__':
     # create players w/ starting balance
+    print("Blackjack Rules:")
+    print("Any number of decks from 1-12.")
+    print("Shoe will shuffle after {}% usage.".format(shuffle_at_percentage*100))
+    print("Double Down, Insurance, Splitting, and Surrender are not permitted.")
+    print("Dealer must stand on soft 17. Blackjack pays 3:2")
+    print()
     name = input("Welcome to the table. What is your name? ")
     player_human = Player(name, 1000)
     player_dealer = Player("Dealer", 1000)
@@ -112,10 +118,12 @@ if __name__ == '__main__':
         player_human.new_game()
         player_dealer.new_game()
 
+        print()
         print("{}'s Balance: {}".format(name, player_human.balance))
         while True:
             try:
                 bet_amount = int(input("How much to bet? "))
+                print()
             except ValueError:
                 print("Looks like you didn't enter an integer.")
                 pass
@@ -156,7 +164,7 @@ if __name__ == '__main__':
             print()
 
         # dealer game play
-        while player_dealer.hand.hand_total() < player_human.hand.hand_total() <= 21:
+        while player_dealer.hand.hand_total() < 17:
             player_dealer.hand.add_card(new_shoe.deal_one())
             print("Dealer has: {}".format(player_dealer.hand))
             print("Dealer total: {}".format(player_dealer.hand.hand_total()))
@@ -168,9 +176,19 @@ if __name__ == '__main__':
         print("{}'s total: {}".format(name, player_hand_total))
         print("Dealer total: {}".format(dealer_hand_total))
         print()
+
         if player_hand_total > 21:
             print("Bust!")
             player_human.balance -= bet_amount
+        elif dealer_hand_total == 21 and len(player_dealer.hand.hand) == 2:
+            if player_hand_total == 21 and len(player_human.hand.hand) == 2:
+                print("Push! Dealer and player have blackjack!")
+            else:
+                print("Dealer blackjack! You lose!")
+                player_human.balance -= bet_amount
+        elif player_hand_total == 21 and len(player_human.hand.hand) == 2:
+            print("Blackjack!")
+            player_human.balance += bet_amount * 1.5
         elif dealer_hand_total < player_hand_total <= 21:
             print("You win!")
             player_human.balance += bet_amount
@@ -178,8 +196,7 @@ if __name__ == '__main__':
             print("You lose!")
             player_human.balance -= bet_amount
         elif dealer_hand_total == player_hand_total:
-            print("Tie!")
+            print("Push!")
         else:
             print("Dealer busts! You win!")
             player_human.balance += bet_amount
-        print()

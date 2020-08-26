@@ -124,7 +124,7 @@ def print_rules():
     print("Blackjack Rules:")
     print("Any number of decks from 1-12.")
     print("Shoe will shuffle after {}% usage.".format(shuffle_at_percentage*100))
-    print("Double Down, Insurance, Splitting, and Surrender are not permitted.")
+    print("Double Down and Surrender are permitted.")
     print("Dealer must stand on soft 17. Blackjack pays 3:2")
     print()
 
@@ -190,18 +190,49 @@ if __name__ == '__main__':
 
         # continue until player stands or busts
         stand = False
+        skip_dealer = False
         while not stand and player_human.hand.hand_total() < 21:
             while True:
-                response = input("[H]it or [S]tand? ")
-                if response[0].capitalize() == 'H':
-                    player_human.hand.add_card(new_shoe.deal_one())
-                    break
-                elif response[0].capitalize() == 'S':
-                    stand = True
-                    break
+                if player_human.hand.hand_size() == 2:
+                    response = input("[H]it, [S]tand, [D]ouble Down, or Su[R]render? ")
+                    if response[0].capitalize() == 'H':
+                        player_human.hand.add_card(new_shoe.deal_one())
+                        break
+                    elif response[0].capitalize() == 'S':
+                        stand = True
+                        break
+                    elif response[0].capitalize() == 'D':
+                        if bet_amount * 2 > player_human.balance:
+                            print("You don't have enough to double down!")
+                            continue
+                        else:
+                            print("Dealing one.")
+                            bet_amount = bet_amount * 2
+                            player_human.hand.add_card(new_shoe.deal_one())
+                            stand = True
+                            break
+                    elif response[0].capitalize() == "R":
+                        # a surrender immediately ends the game
+                        print("Surrendered. Half the bet is returned. ")
+                        player_human.balance -= bet_amount / 2
+                        stand = True
+                        skip_dealer = True
+                        break
+                    else:
+                        print("Invalid response.")
+                        continue
+
                 else:
-                    print("Invalid response.")
-                    continue
+                    response = input("[H]it or [S]tand? ")
+                    if response[0].capitalize() == 'H':
+                        player_human.hand.add_card(new_shoe.deal_one())
+                        break
+                    elif response[0].capitalize() == 'S':
+                        stand = True
+                        break
+                    else:
+                        print("Invalid response.")
+                        continue
             print()
             print("Dealer has: {}".format(player_dealer.hand))
             print("{} has: {}".format(name, player_human.hand))
@@ -210,10 +241,11 @@ if __name__ == '__main__':
 
         # dealer game play
         # must stand on soft 17 (any 17, including A + 6)
-        while player_dealer.hand.hand_total() < 17:
-            player_dealer.hand.add_card(new_shoe.deal_one())
-            print("Dealer has: {}".format(player_dealer.hand))
-            print("Dealer total: {}".format(player_dealer.hand.hand_total()))
-            print()
+        if not skip_dealer:
+            while player_dealer.hand.hand_total() < 17:
+                player_dealer.hand.add_card(new_shoe.deal_one())
+                print("Dealer has: {}".format(player_dealer.hand))
+                print("Dealer total: {}".format(player_dealer.hand.hand_total()))
+                print()
 
-        evaluate_winner(player_human, player_dealer, bet_amount)
+            evaluate_winner(player_human, player_dealer, bet_amount)

@@ -46,6 +46,9 @@ class Hand:
     def add_card(self, card):
         self.hand.append(card)
 
+    def hand_size(self):
+        return len(self.hand)
+
     def hand_total(self):
         num_aces = 0
         temp_total = 0
@@ -180,13 +183,13 @@ if __name__ == '__main__':
         if player_hand_total > 21:
             print("Bust!")
             player_human.balance -= bet_amount
-        elif dealer_hand_total == 21 and len(player_dealer.hand.hand) == 2:
-            if player_hand_total == 21 and len(player_human.hand.hand) == 2:
+        elif dealer_hand_total == 21 and player_dealer.hand.hand_size() == 2:
+            if player_hand_total == 21 and player_human.hand.hand_size() == 2:
                 print("Push! Dealer and player have blackjack!")
             else:
                 print("Dealer blackjack! You lose!")
                 player_human.balance -= bet_amount
-        elif player_hand_total == 21 and len(player_human.hand.hand) == 2:
+        elif player_hand_total == 21 and player_human.hand.hand_size() == 2:
             print("Blackjack!")
             player_human.balance += bet_amount * 1.5
         elif dealer_hand_total < player_hand_total <= 21:

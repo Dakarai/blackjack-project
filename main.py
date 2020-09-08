@@ -120,7 +120,6 @@ def evaluate_winner(player_human, player_dealer, bet_amount):
 
 
 def print_rules():
-    # create players w/ starting balance
     print("Blackjack Rules:")
     print("Any number of decks from 1-12.")
     print("Shoe will shuffle after {}% usage.".format(shuffle_at_percentage*100))
@@ -131,6 +130,7 @@ def print_rules():
 
 if __name__ == '__main__':
     print_rules()
+    # create players w/ starting balance
     name = input("Welcome to the table. What is your name? ")
     player_human = Player(name, 1000)
     player_dealer = Player("Dealer", 1000)
